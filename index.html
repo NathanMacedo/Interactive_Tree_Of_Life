@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="pageTitle">Interactive Tree of Life</title>
   <style>
 
@@ -23,29 +24,39 @@
     .path-g.selected .vis-line { stroke: #f39c12; stroke-width: 7; }
     .path-label { transition: opacity .22s ease, transform .22s ease; }
 
-    /* FLOATING INFO - symmetric panels */
+    .info-container {
+      position: absolute; bottom: 18px; left: 18px; right: 18px;
+      display: flex; gap: 20px; justify-content: space-between;
+      align-items: flex-end; pointer-events: none; z-index: 200;
+    }
     #infoPanel, #hoverInfoPanel {
-      position: absolute; bottom: 18px;
       background: rgba(255,255,255,.97); border-radius: 12px;
       padding: 15px 22px; min-width: 260px; max-width: 380px;
       box-shadow: 0 6px 24px rgba(0,0,0,.13); border-left: 5px solid #3498db;
-      display: none; z-index: 200; font-size: 14px; line-height: 1.5;
-      transition: all .3s ease;
+      display: none; font-size: 14px; line-height: 1.5;
+      pointer-events: auto; transition: all .3s ease;
     }
-    #infoPanel { left: 18px; }
-    #hoverInfoPanel { right: 18px; border-left: none; border-right: 5px solid #e74c3c; }
+    #hoverInfoPanel { border-left: none; border-right: 5px solid #e74c3c; }
     
     #infoPanel h3, #hoverInfoPanel h3 { margin: 0 0 8px; color: #2c3e50; font-size: 16px; }
     #hoverInfoPanel h3 { text-align: right; }
 
     @media (max-width: 768px) {
-      #infoPanel, #hoverInfoPanel {
-        left: 50% !important; right: auto !important; transform: translateX(-50%);
-        min-width: 95vw; max-width: 95vw;
+      .info-container {
+        bottom: 8px !important; left: 5px !important; right: 5px !important; 
+        gap: 6px !important; display: flex !important; flex-direction: row !important;
       }
-      #infoPanel { bottom: 10px; }
-      #hoverInfoPanel { bottom: 180px; border-right: none; border-left: 5px solid #e74c3c; }
-      #hoverInfoPanel h3 { text-align: left; }
+      #infoPanel, #hoverInfoPanel {
+        min-width: 0 !important; flex: 1 !important; 
+        padding: 5px 8px !important; font-size: 10px !important; line-height: 1.2 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,.15) !important;
+        border-radius: 8px !important;
+      }
+      #hoverInfoPanel { border-left: 3px solid #e74c3c !important; border-right: none !important; }
+      #infoPanel h3, #hoverInfoPanel h3 { font-size: 11px !important; margin-bottom: 2px !important; }
+      #hoverInfoPanel h3 { text-align: left !important; }
+      .info-row { padding: 1px 0 !important; gap: 4px !important; border-bottom: none !important; }
+      .info-label { font-size: 9px !important; }
     }
     .info-row { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid #f0f0f0; padding: 4px 0; font-size: 13px; }
     .info-label { font-weight: 600; color: #7f8c8d; white-space: nowrap; }
@@ -117,8 +128,10 @@
     <button id="btnToggleAll" onclick="toggleAllLabels(event)" data-en="Show All Labels" data-pt="Mostrar Todos">Show All Labels</button>
     <button id="btnClear" onclick="clearSelection(event)" data-en="Clear Selection" data-pt="Limpar Seleção">Clear Selection</button>
   </div>
-  <div id="infoPanel"></div>
-  <div id="hoverInfoPanel"></div>
+  <div class="info-container">
+    <div id="infoPanel"></div>
+    <div id="hoverInfoPanel"></div>
+  </div>
   <svg id="treeSvg" viewBox="0 0 800 1250" xmlns="http://www.w3.org/2000/svg" font-family="Arial">
     <defs>
       <filter id="glow"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
@@ -902,7 +915,6 @@ function updateVisuals() {
 // --- PATH SELECTION ---
 function selectPath(e, pid) {
   e.stopPropagation();
-  hideInfo("hoverInfoPanel");
 
   const idx = selections.findIndex(s => s.type === 'path' && s.id === pid);
   if (idx !== -1) {
@@ -928,16 +940,16 @@ function refreshPathInfo(pid, isHover, forceTarget) {
   const attr_type = d.attr_type[lang];
   const attr_val = d.attr_val[lang];
   
+  if (isHover && !showAll) applyLabelState(pid, true, true);
+  if (isHover && selections.length >= 2) return; // Only show label, no table
+  
   let target = forceTarget;
   if (!target) {
     if (isHover) {
        if (selections.length === 0) target = "infoPanel";
        else if (selections.length === 1) target = "hoverInfoPanel";
-       else return; // Max visible
     } else target = "infoPanel";
   }
-  
-  if (isHover && !showAll) applyLabelState(pid, true, true);
   
   const p = document.getElementById(target);
   if (p) p.style.display = "block";
@@ -953,7 +965,6 @@ function refreshPathInfo(pid, isHover, forceTarget) {
 // --- SPHERE SELECTION ---
 function selectSphere(e, key) {
   e.stopPropagation();
-  hideInfo("hoverInfoPanel");
 
   const idx = selections.findIndex(s => s.type === 'sphere' && s.id === key);
   if (idx !== -1) {
@@ -978,12 +989,13 @@ function refreshSphereInfo(key, isHover, forceTarget) {
   const element= typeof d.element === "object" ? d.element[lang] : d.element;
   const metal  = typeof d.metal   === "object" ? d.metal[lang]   : d.metal;
   
+  if (isHover && selections.length >= 2) return; 
+
   let target = forceTarget;
   if (!target) {
     if (isHover) {
        if (selections.length === 0) target = "infoPanel";
        else if (selections.length === 1) target = "hoverInfoPanel";
-       else return; 
     } else target = "infoPanel";
   }
   
@@ -1012,14 +1024,18 @@ function showInfo(targetId, color, title, rows) {
   p.style.display = "block";
 }
 function hideInfo(targetId) {
-  const p = document.getElementById(targetId || "infoPanel");
-  if (p) p.style.display = "none";
-  
   if (targetId === "hoverInfoPanel") {
     for (let pid = 0; pid < 22; pid++) {
       if (!showAll && !selections.some(s => s.type === 'path' && s.id === pid)) applyLabelState(pid, false, false);
     }
   }
+
+  // Persistence check: Don't hide the DOM table if this panel is showing a persistent selection
+  if (targetId === "infoPanel" && selections.length >= 1) return;
+  if (targetId === "hoverInfoPanel" && selections.length >= 2) return;
+
+  const p = document.getElementById(targetId || "infoPanel");
+  if (p) p.style.display = "none";
 }
 
 // --- BACKGROUND CLICK (clear selection) ---
