@@ -23,15 +23,30 @@
     .path-g.selected .vis-line { stroke: #f39c12; stroke-width: 7; }
     .path-label { transition: opacity .22s ease, transform .22s ease; }
 
-    /* FLOATING INFO - bottom left of tree area */
-    #infoPanel {
-      position: absolute; bottom: 18px; left: 18px;
+    /* FLOATING INFO - symmetric panels */
+    #infoPanel, #hoverInfoPanel {
+      position: absolute; bottom: 18px;
       background: rgba(255,255,255,.97); border-radius: 12px;
       padding: 15px 22px; min-width: 260px; max-width: 380px;
       box-shadow: 0 6px 24px rgba(0,0,0,.13); border-left: 5px solid #3498db;
       display: none; z-index: 200; font-size: 14px; line-height: 1.5;
+      transition: all .3s ease;
     }
-    #infoPanel h3 { margin: 0 0 8px; color: #2c3e50; font-size: 16px; }
+    #infoPanel { left: 18px; }
+    #hoverInfoPanel { right: 18px; border-left: none; border-right: 5px solid #e74c3c; }
+    
+    #infoPanel h3, #hoverInfoPanel h3 { margin: 0 0 8px; color: #2c3e50; font-size: 16px; }
+    #hoverInfoPanel h3 { text-align: right; }
+
+    @media (max-width: 768px) {
+      #infoPanel, #hoverInfoPanel {
+        left: 50% !important; right: auto !important; transform: translateX(-50%);
+        min-width: 95vw; max-width: 95vw;
+      }
+      #infoPanel { bottom: 10px; }
+      #hoverInfoPanel { bottom: 180px; border-right: none; border-left: 5px solid #e74c3c; }
+      #hoverInfoPanel h3 { text-align: left; }
+    }
     .info-row { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid #f0f0f0; padding: 4px 0; font-size: 13px; }
     .info-label { font-weight: 600; color: #7f8c8d; white-space: nowrap; }
     .sym { font-family: "Segoe UI Symbol", sans-serif; }
@@ -74,6 +89,9 @@
     .c-red { font-weight: 700; color: #e74c3c; }
     .c-teal { font-weight: 500; color: #16a085; }
     .c-grey { font-weight: 700; color: #7f8c8d; }
+    td[data-en="Element"] { color: #9b59b6; }
+    td[data-en="Planet"] { color: #e67e22; }
+    td[data-en="Zodiac"] { color: #3498db; }
 
     /* ALCHEMY */
     .alch-card { background: #fff; border-radius: 10px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,.06); margin-bottom: 20px; }
@@ -100,6 +118,7 @@
     <button id="btnClear" onclick="clearSelection(event)" data-en="Clear Selection" data-pt="Limpar Seleção">Clear Selection</button>
   </div>
   <div id="infoPanel"></div>
+  <div id="hoverInfoPanel"></div>
   <svg id="treeSvg" viewBox="0 0 800 1250" xmlns="http://www.w3.org/2000/svg" font-family="Arial">
     <defs>
       <filter id="glow"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
@@ -127,20 +146,155 @@
     <line x1="600" y1="850" x2="400" y2="1150" stroke="#ddd" stroke-width="3" />
     <line x1="200" y1="850" x2="400" y2="1150" stroke="#ddd" stroke-width="3" />
 
-    <g id="path_0" class="path-g" onclick="selectPath(event,0)">
+    <g id="path_0" class="path-g" onclick="selectPath(event,0)" onmouseover="refreshPathInfo(0, true)" onmouseout="hideInfo('hoverInfoPanel')">
       <line x1="400" y1="100" x2="600" y2="250" stroke="transparent" stroke-width="22" />
       <line class="vis-line" x1="400" y1="100" x2="600" y2="250" stroke="#666" stroke-width="3" />
     </g>
+    <g id="path_1" class="path-g" onclick="selectPath(event,1)" onmouseover="refreshPathInfo(1, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="400" y1="100" x2="200" y2="250" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="400" y1="100" x2="200" y2="250" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_2" class="path-g" onclick="selectPath(event,2)" onmouseover="refreshPathInfo(2, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="400" y1="100" x2="400" y2="700" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="400" y1="100" x2="400" y2="700" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_3" class="path-g" onclick="selectPath(event,3)" onmouseover="refreshPathInfo(3, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="200" y1="250" x2="600" y2="250" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="200" y1="250" x2="600" y2="250" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_4" class="path-g" onclick="selectPath(event,4)" onmouseover="refreshPathInfo(4, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="600" y1="250" x2="600" y2="550" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="600" y1="250" x2="600" y2="550" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_5" class="path-g" onclick="selectPath(event,5)" onmouseover="refreshPathInfo(5, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="600" y1="250" x2="400" y2="700" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="600" y1="250" x2="400" y2="700" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_6" class="path-g" onclick="selectPath(event,6)" onmouseover="refreshPathInfo(6, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="200" y1="250" x2="400" y2="700" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="200" y1="250" x2="400" y2="700" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_7" class="path-g" onclick="selectPath(event,7)" onmouseover="refreshPathInfo(7, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="200" y1="250" x2="200" y2="550" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="200" y1="250" x2="200" y2="550" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_8" class="path-g" onclick="selectPath(event,8)" onmouseover="refreshPathInfo(8, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="200" y1="550" x2="600" y2="550" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="200" y1="550" x2="600" y2="550" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_9" class="path-g" onclick="selectPath(event,9)" onmouseover="refreshPathInfo(9, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="600" y1="550" x2="400" y2="700" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="600" y1="550" x2="400" y2="700" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_10" class="path-g" onclick="selectPath(event,10)" onmouseover="refreshPathInfo(10, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="600" y1="550" x2="600" y2="850" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="600" y1="550" x2="600" y2="850" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_11" class="path-g" onclick="selectPath(event,11)" onmouseover="refreshPathInfo(11, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="200" y1="550" x2="400" y2="700" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="200" y1="550" x2="400" y2="700" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_12" class="path-g" onclick="selectPath(event,12)" onmouseover="refreshPathInfo(12, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="200" y1="550" x2="200" y2="850" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="200" y1="550" x2="200" y2="850" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_13" class="path-g" onclick="selectPath(event,13)" onmouseover="refreshPathInfo(13, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="400" y1="700" x2="600" y2="850" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="400" y1="700" x2="600" y2="850" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_14" class="path-g" onclick="selectPath(event,14)" onmouseover="refreshPathInfo(14, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="400" y1="700" x2="400" y2="1000" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="400" y1="700" x2="400" y2="1000" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_15" class="path-g" onclick="selectPath(event,15)" onmouseover="refreshPathInfo(15, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="400" y1="700" x2="200" y2="850" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="400" y1="700" x2="200" y2="850" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_16" class="path-g" onclick="selectPath(event,16)" onmouseover="refreshPathInfo(16, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="200" y1="850" x2="600" y2="850" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="200" y1="850" x2="600" y2="850" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_17" class="path-g" onclick="selectPath(event,17)" onmouseover="refreshPathInfo(17, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="600" y1="850" x2="400" y2="1000" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="600" y1="850" x2="400" y2="1000" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_18" class="path-g" onclick="selectPath(event,18)" onmouseover="refreshPathInfo(18, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="200" y1="850" x2="400" y2="1000" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="200" y1="850" x2="400" y2="1000" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_19" class="path-g" onclick="selectPath(event,19)" onmouseover="refreshPathInfo(19, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="400" y1="1000" x2="400" y2="1150" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="400" y1="1000" x2="400" y2="1150" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_20" class="path-g" onclick="selectPath(event,20)" onmouseover="refreshPathInfo(20, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="600" y1="850" x2="400" y2="1150" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="600" y1="850" x2="400" y2="1150" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="path_21" class="path-g" onclick="selectPath(event,21)" onmouseover="refreshPathInfo(21, true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <line x1="200" y1="850" x2="400" y2="1150" stroke="transparent" stroke-width="22" />
+      <line class="vis-line" x1="200" y1="850" x2="400" y2="1150" stroke="#666" stroke-width="3" />
+    </g>
+    <g id="seph_Keter" class="seph-g" onclick="selectSphere(event,'Keter')" onmouseover="refreshSphereInfo('Keter', true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <circle cx="400" cy="100" r="50" fill="#fff5cc" stroke="#daa520" stroke-width="3" />
+      <text id="sname_Keter" x="400" y="87" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Keter" data-pt="Keter">Keter</text>
+      <text x="400" y="114" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">♔</text>
+    </g>
+    <g id="seph_Chokmah" class="seph-g" onclick="selectSphere(event,'Chokmah')" onmouseover="refreshSphereInfo('Chokmah', true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <circle cx="600" cy="250" r="50" fill="#cce5ff" stroke="#1e90ff" stroke-width="3" />
+      <text id="sname_Chokmah" x="600" y="237" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Chokmah" data-pt="Chokmah">Chokmah</text>
+      <text x="600" y="264" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">✴</text>
+    </g>
+    <g id="seph_Binah" class="seph-g" onclick="selectSphere(event,'Binah')" onmouseover="refreshSphereInfo('Binah', true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <circle cx="200" cy="250" r="50" fill="#fcdada" stroke="#800000" stroke-width="3" />
+      <text id="sname_Binah" x="200" y="237" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Binah" data-pt="Binah">Binah</text>
+      <text x="200" y="264" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">♄</text>
+    </g>
+    <g id="seph_Chesed" class="seph-g" onclick="selectSphere(event,'Chesed')" onmouseover="refreshSphereInfo('Chesed', true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <circle cx="600" cy="550" r="50" fill="#99ccff" stroke="#1e90ff" stroke-width="3" />
+      <text id="sname_Chesed" x="600" y="537" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Chesed" data-pt="Chesed">Chesed</text>
+      <text x="600" y="564" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">♃</text>
+    </g>
+    <g id="seph_Geburah" class="seph-g" onclick="selectSphere(event,'Geburah')" onmouseover="refreshSphereInfo('Geburah', true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <circle cx="200" cy="550" r="50" fill="#fcbcbc" stroke="#800000" stroke-width="3" />
+      <text id="sname_Geburah" x="200" y="537" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Geburah" data-pt="Geburah">Geburah</text>
+      <text x="200" y="564" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">♂</text>
+    </g>
+    <g id="seph_Tiphareth" class="seph-g" onclick="selectSphere(event,'Tiphareth')" onmouseover="refreshSphereInfo('Tiphareth', true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <circle cx="400" cy="700" r="50" fill="#fff0a5" stroke="#daa520" stroke-width="3" />
+      <text id="sname_Tiphareth" x="400" y="687" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Tiphareth" data-pt="Tiphareth">Tiphareth</text>
+      <text x="400" y="714" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">☉</text>
+    </g>
+    <g id="seph_Netzach" class="seph-g" onclick="selectSphere(event,'Netzach')" onmouseover="refreshSphereInfo('Netzach', true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <circle cx="600" cy="850" r="50" fill="#66b3ff" stroke="#1e90ff" stroke-width="3" />
+      <text id="sname_Netzach" x="600" y="837" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Netzach" data-pt="Netzach">Netzach</text>
+      <text x="600" y="864" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">♀</text>
+    </g>
+    <g id="seph_Hod" class="seph-g" onclick="selectSphere(event,'Hod')" onmouseover="refreshSphereInfo('Hod', true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <circle cx="200" cy="850" r="50" fill="#fca5a5" stroke="#800000" stroke-width="3" />
+      <text id="sname_Hod" x="200" y="837" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Hod" data-pt="Hod">Hod</text>
+      <text x="200" y="864" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">☿</text>
+    </g>
+    <g id="seph_Yesod" class="seph-g" onclick="selectSphere(event,'Yesod')" onmouseover="refreshSphereInfo('Yesod', true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <circle cx="400" cy="1000" r="50" fill="#ffe680" stroke="#daa520" stroke-width="3" />
+      <text id="sname_Yesod" x="400" y="987" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Yesod" data-pt="Yesod">Yesod</text>
+      <text x="400" y="1014" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">☽</text>
+    </g>
+    <g id="seph_Malkuth" class="seph-g" onclick="selectSphere(event,'Malkuth')" onmouseover="refreshSphereInfo('Malkuth', true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <circle cx="400" cy="1150" r="50" fill="#ffd700" stroke="#daa520" stroke-width="3" />
+      <text id="sname_Malkuth" x="400" y="1137" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Malkuth" data-pt="Malkuth">Malkuth</text>
+      <text x="400" y="1164" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">♁</text>
+    </g>
+    <g id="seph_Daat" class="seph-g" onclick="selectSphere(event,'Daat')" onmouseover="refreshSphereInfo('Daat', true)" onmouseout="hideInfo('hoverInfoPanel')">
+      <circle cx="400" cy="400" r="37" fill="#d1a3ff" stroke="#777" stroke-width="2" stroke-dasharray="7,5" />
+      <text id="sname_Daat" x="400" y="400" text-anchor="middle" dominant-baseline="middle" font-style="italic" font-weight="bold" font-size="15" fill="#555" data-en="Da'at" data-pt="Da'at">Da'at</text>
+    </g>
+
     <g id="label_0" class="path-label" style="opacity:0;pointer-events:none;transform-origin:538.8908729652601px 136.10912703473988px;transform:scale(0.85);">
       <line x1="500.0" y1="175.0" x2="538.8908729652601" y2="136.10912703473988" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
       <rect x="495.8908729652601" y="111.10912703473988" width="86" height="50" rx="10" fill="#fff" stroke="#555" stroke-width="1.5" />
       <text x="538.8908729652601" y="121.10912703473988" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="13" fill="#222">Aleph – א</text>
       <text id="lnum_0" x="538.8908729652601" y="136.10912703473988" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="0" data-th="0">0</text>
       <text id="lname_0" x="538.8908729652601" y="150.10912703473988" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The Fool" data-ptger="O Louco" data-enth="The Fool" data-ptth="O Louco">The Fool</text>
-    </g>
-    <g id="path_1" class="path-g" onclick="selectPath(event,1)">
-      <line x1="400" y1="100" x2="200" y2="250" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="400" y1="100" x2="200" y2="250" stroke="#666" stroke-width="3" />
     </g>
     <g id="label_1" class="path-label" style="opacity:0;pointer-events:none;transform-origin:261.1091270347399px 136.10912703473988px;transform:scale(0.85);">
       <line x1="300.0" y1="175.0" x2="261.1091270347399" y2="136.10912703473988" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
@@ -149,20 +303,12 @@
       <text id="lnum_1" x="261.1091270347399" y="136.10912703473988" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="I" data-th="I">I</text>
       <text id="lname_1" x="261.1091270347399" y="150.10912703473988" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The Magician" data-ptger="O Mago" data-enth="The Magician" data-ptth="O Mago">The Magician</text>
     </g>
-    <g id="path_2" class="path-g" onclick="selectPath(event,2)">
-      <line x1="400" y1="100" x2="400" y2="700" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="400" y1="100" x2="400" y2="700" stroke="#666" stroke-width="3" />
-    </g>
     <g id="label_2" class="path-label" style="opacity:0;pointer-events:none;transform-origin:460.0px 280.0px;transform:scale(0.85);">
       <line x1="400.0" y1="280.0" x2="460.0" y2="280.0" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
       <rect x="417.0" y="255.0" width="86" height="50" rx="10" fill="#fff" stroke="#555" stroke-width="1.5" />
       <text x="460.0" y="265.0" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="13" fill="#222">Gimel – ג</text>
       <text id="lnum_2" x="460.0" y="280.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="II" data-th="II">II</text>
       <text id="lname_2" x="460.0" y="294.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="High Priestess" data-ptger="A Sacerdotisa" data-enth="High Priestess" data-ptth="A Sacerdotisa">High Priestess</text>
-    </g>
-    <g id="path_3" class="path-g" onclick="selectPath(event,3)">
-      <line x1="200" y1="250" x2="600" y2="250" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="200" y1="250" x2="600" y2="250" stroke="#666" stroke-width="3" />
     </g>
     <g id="label_3" class="path-label" style="opacity:0;pointer-events:none;transform-origin:400.0px 195.0px;transform:scale(0.85);">
       <line x1="400.0" y1="250.0" x2="400.0" y2="195.0" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
@@ -171,20 +317,12 @@
       <text id="lnum_3" x="400.0" y="195.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="III" data-th="III">III</text>
       <text id="lname_3" x="400.0" y="209.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The Empress" data-ptger="A Imperatriz" data-enth="The Empress" data-ptth="A Imperatriz">The Empress</text>
     </g>
-    <g id="path_4" class="path-g" onclick="selectPath(event,4)">
-      <line x1="600" y1="250" x2="600" y2="550" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="600" y1="250" x2="600" y2="550" stroke="#666" stroke-width="3" />
-    </g>
     <g id="label_4" class="path-label" style="opacity:0;pointer-events:none;transform-origin:665.0px 400.0px;transform:scale(0.85);">
       <line x1="600.0" y1="400.0" x2="665.0" y2="400.0" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
       <rect x="622.0" y="375.0" width="86" height="50" rx="10" fill="#fff" stroke="#555" stroke-width="1.5" />
       <text x="665.0" y="385.0" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="13" fill="#222">He – ה</text>
       <text id="lnum_4" x="665.0" y="400.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="IV" data-th="XVII">IV</text>
       <text id="lname_4" x="665.0" y="414.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The Emperor" data-ptger="O Imperador" data-enth="The Star" data-ptth="A Estrela">The Emperor</text>
-    </g>
-    <g id="path_5" class="path-g" onclick="selectPath(event,5)">
-      <line x1="600" y1="250" x2="400" y2="700" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="600" y1="250" x2="400" y2="700" stroke="#666" stroke-width="3" />
     </g>
     <g id="label_5" class="path-label" style="opacity:0;pointer-events:none;transform-origin:570.0245047998781px 416.48529712007314px;transform:scale(0.85);">
       <line x1="510.0" y1="452.5" x2="570.0245047998781" y2="416.48529712007314" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
@@ -193,20 +331,12 @@
       <text id="lnum_5" x="570.0245047998781" y="416.48529712007314" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="V" data-th="V">V</text>
       <text id="lname_5" x="570.0245047998781" y="430.48529712007314" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The Hierophant" data-ptger="O Hierofante" data-enth="The Hierophant" data-ptth="O Hierofante">The Hierophant</text>
     </g>
-    <g id="path_6" class="path-g" onclick="selectPath(event,6)">
-      <line x1="200" y1="250" x2="400" y2="700" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="200" y1="250" x2="400" y2="700" stroke="#666" stroke-width="3" />
-    </g>
     <g id="label_6" class="path-label" style="opacity:0;pointer-events:none;transform-origin:229.97549520012188px 416.48529712007314px;transform:scale(0.85);">
       <line x1="290.0" y1="452.5" x2="229.97549520012188" y2="416.48529712007314" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
       <rect x="186.97549520012188" y="391.48529712007314" width="86" height="50" rx="10" fill="#fff" stroke="#555" stroke-width="1.5" />
       <text x="229.97549520012188" y="401.48529712007314" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="13" fill="#222">Zayin – ז</text>
       <text id="lnum_6" x="229.97549520012188" y="416.48529712007314" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="VI" data-th="VI">VI</text>
       <text id="lname_6" x="229.97549520012188" y="430.48529712007314" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The Lovers" data-ptger="Os Amantes" data-enth="The Lovers" data-ptth="Os Amantes">The Lovers</text>
-    </g>
-    <g id="path_7" class="path-g" onclick="selectPath(event,7)">
-      <line x1="200" y1="250" x2="200" y2="550" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="200" y1="250" x2="200" y2="550" stroke="#666" stroke-width="3" />
     </g>
     <g id="label_7" class="path-label" style="opacity:0;pointer-events:none;transform-origin:135.0px 400.0px;transform:scale(0.85);">
       <line x1="200.0" y1="400.0" x2="135.0" y2="400.0" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
@@ -215,20 +345,12 @@
       <text id="lnum_7" x="135.0" y="400.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="VII" data-th="VII">VII</text>
       <text id="lname_7" x="135.0" y="414.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The Chariot" data-ptger="O Carro" data-enth="The Chariot" data-ptth="O Carro">The Chariot</text>
     </g>
-    <g id="path_8" class="path-g" onclick="selectPath(event,8)">
-      <line x1="200" y1="550" x2="600" y2="550" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="200" y1="550" x2="600" y2="550" stroke="#666" stroke-width="3" />
-    </g>
     <g id="label_8" class="path-label" style="opacity:0;pointer-events:none;transform-origin:400.0px 500.0px;transform:scale(0.85);">
       <line x1="400.0" y1="550.0" x2="400.0" y2="500.0" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
       <rect x="357.0" y="475.0" width="86" height="50" rx="10" fill="#fff" stroke="#555" stroke-width="1.5" />
       <text x="400.0" y="485.0" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="13" fill="#222">Teth – ט</text>
       <text id="lnum_8" x="400.0" y="500.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="VIII" data-th="VIII">VIII</text>
       <text id="lname_8" x="400.0" y="514.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="Strength" data-ptger="Força" data-enth="Strength" data-ptth="Força">Strength</text>
-    </g>
-    <g id="path_9" class="path-g" onclick="selectPath(event,9)">
-      <line x1="600" y1="550" x2="400" y2="700" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="600" y1="550" x2="400" y2="700" stroke="#666" stroke-width="3" />
     </g>
     <g id="label_9" class="path-label" style="opacity:0;pointer-events:none;transform-origin:550.0245047998781px 668.5147028799269px;transform:scale(0.85);">
       <line x1="490.0" y1="632.5" x2="550.0245047998781" y2="668.5147028799269" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
@@ -237,20 +359,12 @@
       <text id="lnum_9" x="550.0245047998781" y="668.5147028799269" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="IX" data-th="IX">IX</text>
       <text id="lname_9" x="550.0245047998781" y="682.5147028799269" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The Hermit" data-ptger="O Eremita" data-enth="The Hermit" data-ptth="O Eremita">The Hermit</text>
     </g>
-    <g id="path_10" class="path-g" onclick="selectPath(event,10)">
-      <line x1="600" y1="550" x2="600" y2="850" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="600" y1="550" x2="600" y2="850" stroke="#666" stroke-width="3" />
-    </g>
     <g id="label_10" class="path-label" style="opacity:0;pointer-events:none;transform-origin:665.0px 700.0px;transform:scale(0.85);">
       <line x1="600.0" y1="700.0" x2="665.0" y2="700.0" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
       <rect x="622.0" y="675.0" width="86" height="50" rx="10" fill="#fff" stroke="#555" stroke-width="1.5" />
       <text x="665.0" y="685.0" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="13" fill="#222">Kaph – כ</text>
       <text id="lnum_10" x="665.0" y="700.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="X" data-th="X">X</text>
       <text id="lname_10" x="665.0" y="714.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="Wheel of Fortune" data-ptger="A Roda da Fortuna" data-enth="Wheel of Fortune" data-ptth="A Roda da Fortuna">Wheel of Fortune</text>
-    </g>
-    <g id="path_11" class="path-g" onclick="selectPath(event,11)">
-      <line x1="200" y1="550" x2="400" y2="700" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="200" y1="550" x2="400" y2="700" stroke="#666" stroke-width="3" />
     </g>
     <g id="label_11" class="path-label" style="opacity:0;pointer-events:none;transform-origin:249.97549520012188px 668.5147028799269px;transform:scale(0.85);">
       <line x1="310.0" y1="632.5" x2="249.97549520012188" y2="668.5147028799269" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
@@ -259,20 +373,12 @@
       <text id="lnum_11" x="249.97549520012188" y="668.5147028799269" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="XI" data-th="XI">XI</text>
       <text id="lname_11" x="249.97549520012188" y="682.5147028799269" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="Justice" data-ptger="Justiça" data-enth="Justice" data-ptth="Justiça">Justice</text>
     </g>
-    <g id="path_12" class="path-g" onclick="selectPath(event,12)">
-      <line x1="200" y1="550" x2="200" y2="850" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="200" y1="550" x2="200" y2="850" stroke="#666" stroke-width="3" />
-    </g>
     <g id="label_12" class="path-label" style="opacity:0;pointer-events:none;transform-origin:135.0px 700.0px;transform:scale(0.85);">
       <line x1="200.0" y1="700.0" x2="135.0" y2="700.0" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
       <rect x="92.0" y="675.0" width="86" height="50" rx="10" fill="#fff" stroke="#555" stroke-width="1.5" />
       <text x="135.0" y="685.0" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="13" fill="#222">Mem – מ</text>
       <text id="lnum_12" x="135.0" y="700.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="XII" data-th="XII">XII</text>
       <text id="lname_12" x="135.0" y="714.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The Hanged Man" data-ptger="O Enforcado" data-enth="The Hanged Man" data-ptth="O Enforcado">The Hanged Man</text>
-    </g>
-    <g id="path_13" class="path-g" onclick="selectPath(event,13)">
-      <line x1="400" y1="700" x2="600" y2="850" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="400" y1="700" x2="600" y2="850" stroke="#666" stroke-width="3" />
     </g>
     <g id="label_13" class="path-label" style="opacity:0;pointer-events:none;transform-origin:560.0245047998781px 738.9852971200731px;transform:scale(0.85);">
       <line x1="500.0" y1="775.0" x2="560.0245047998781" y2="738.9852971200731" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
@@ -281,20 +387,12 @@
       <text id="lnum_13" x="560.0245047998781" y="738.9852971200731" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="XIII" data-th="XIII">XIII</text>
       <text id="lname_13" x="560.0245047998781" y="752.9852971200731" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="Death" data-ptger="A Morte" data-enth="Death" data-ptth="A Morte">Death</text>
     </g>
-    <g id="path_14" class="path-g" onclick="selectPath(event,14)">
-      <line x1="400" y1="700" x2="400" y2="1000" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="400" y1="700" x2="400" y2="1000" stroke="#666" stroke-width="3" />
-    </g>
     <g id="label_14" class="path-label" style="opacity:0;pointer-events:none;transform-origin:340.0px 790.0px;transform:scale(0.85);">
       <line x1="400.0" y1="790.0" x2="340.0" y2="790.0" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
       <rect x="292.0" y="765.0" width="96" height="50" rx="10" fill="#fff" stroke="#555" stroke-width="1.5" />
       <text x="340.0" y="775.0" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="13" fill="#222">Samekh – ס</text>
       <text id="lnum_14" x="340.0" y="790.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="XIV" data-th="XIV">XIV</text>
       <text id="lname_14" x="340.0" y="804.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="Temperance" data-ptger="Temperança" data-enth="Temperance" data-ptth="Temperança">Temperance</text>
-    </g>
-    <g id="path_15" class="path-g" onclick="selectPath(event,15)">
-      <line x1="400" y1="700" x2="200" y2="850" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="400" y1="700" x2="200" y2="850" stroke="#666" stroke-width="3" />
     </g>
     <g id="label_15" class="path-label" style="opacity:0;pointer-events:none;transform-origin:239.97549520012188px 738.9852971200731px;transform:scale(0.85);">
       <line x1="300.0" y1="775.0" x2="239.97549520012188" y2="738.9852971200731" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
@@ -303,20 +401,12 @@
       <text id="lnum_15" x="239.97549520012188" y="738.9852971200731" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="XV" data-th="XV">XV</text>
       <text id="lname_15" x="239.97549520012188" y="752.9852971200731" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The Devil" data-ptger="O Diabo" data-enth="The Devil" data-ptth="O Diabo">The Devil</text>
     </g>
-    <g id="path_16" class="path-g" onclick="selectPath(event,16)">
-      <line x1="200" y1="850" x2="600" y2="850" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="200" y1="850" x2="600" y2="850" stroke="#666" stroke-width="3" />
-    </g>
     <g id="label_16" class="path-label" style="opacity:0;pointer-events:none;transform-origin:400.0px 905.0px;transform:scale(0.85);">
       <line x1="400.0" y1="850.0" x2="400.0" y2="905.0" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
       <rect x="357.0" y="880.0" width="86" height="50" rx="10" fill="#fff" stroke="#555" stroke-width="1.5" />
       <text x="400.0" y="890.0" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="13" fill="#222">Pe – פ</text>
       <text id="lnum_16" x="400.0" y="905.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="XVI" data-th="XVI">XVI</text>
       <text id="lname_16" x="400.0" y="919.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The Tower" data-ptger="A Torre" data-enth="The Tower" data-ptth="A Torre">The Tower</text>
-    </g>
-    <g id="path_17" class="path-g" onclick="selectPath(event,17)">
-      <line x1="600" y1="850" x2="400" y2="1000" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="600" y1="850" x2="400" y2="1000" stroke="#666" stroke-width="3" />
     </g>
     <g id="label_17" class="path-label" style="opacity:0;pointer-events:none;transform-origin:550.0245047998781px 968.5147028799269px;transform:scale(0.85);">
       <line x1="490.0" y1="932.5" x2="550.0245047998781" y2="968.5147028799269" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
@@ -325,20 +415,12 @@
       <text id="lnum_17" x="550.0245047998781" y="968.5147028799269" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="XVII" data-th="IV">XVII</text>
       <text id="lname_17" x="550.0245047998781" y="982.5147028799269" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The Star" data-ptger="A Estrela" data-enth="The Emperor" data-ptth="O Imperador">The Star</text>
     </g>
-    <g id="path_18" class="path-g" onclick="selectPath(event,18)">
-      <line x1="200" y1="850" x2="400" y2="1000" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="200" y1="850" x2="400" y2="1000" stroke="#666" stroke-width="3" />
-    </g>
     <g id="label_18" class="path-label" style="opacity:0;pointer-events:none;transform-origin:249.97549520012188px 968.5147028799269px;transform:scale(0.85);">
       <line x1="310.0" y1="932.5" x2="249.97549520012188" y2="968.5147028799269" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
       <rect x="206.97549520012188" y="943.5147028799269" width="86" height="50" rx="10" fill="#fff" stroke="#555" stroke-width="1.5" />
       <text x="249.97549520012188" y="953.5147028799269" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="13" fill="#222">Qoph – ק</text>
       <text id="lnum_18" x="249.97549520012188" y="968.5147028799269" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="XVIII" data-th="XVIII">XVIII</text>
       <text id="lname_18" x="249.97549520012188" y="982.5147028799269" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The Moon" data-ptger="A Lua" data-enth="The Moon" data-ptth="A Lua">The Moon</text>
-    </g>
-    <g id="path_19" class="path-g" onclick="selectPath(event,19)">
-      <line x1="400" y1="1000" x2="400" y2="1150" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="400" y1="1000" x2="400" y2="1150" stroke="#666" stroke-width="3" />
     </g>
     <g id="label_19" class="path-label" style="opacity:0;pointer-events:none;transform-origin:460.0px 1075.0px;transform:scale(0.85);">
       <line x1="400.0" y1="1075.0" x2="460.0" y2="1075.0" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
@@ -347,20 +429,12 @@
       <text id="lnum_19" x="460.0" y="1075.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="XIX" data-th="XIX">XIX</text>
       <text id="lname_19" x="460.0" y="1089.0" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The Sun" data-ptger="O Sol" data-enth="The Sun" data-ptth="O Sol">The Sun</text>
     </g>
-    <g id="path_20" class="path-g" onclick="selectPath(event,20)">
-      <line x1="600" y1="850" x2="400" y2="1150" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="600" y1="850" x2="400" y2="1150" stroke="#666" stroke-width="3" />
-    </g>
     <g id="label_20" class="path-label" style="opacity:0;pointer-events:none;transform-origin:537.0820393249937px 1078.5410196624969px;transform:scale(0.85);">
       <line x1="470.0" y1="1045.0" x2="537.0820393249937" y2="1078.5410196624969" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
       <rect x="494.08203932499373" y="1053.5410196624969" width="86" height="50" rx="10" fill="#fff" stroke="#555" stroke-width="1.5" />
       <text x="537.0820393249937" y="1063.5410196624969" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="13" fill="#222">Shin – ש</text>
       <text id="lnum_20" x="537.0820393249937" y="1078.5410196624969" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="XX" data-th="XX">XX</text>
       <text id="lname_20" x="537.0820393249937" y="1092.5410196624969" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="Judgement" data-ptger="Julgamento" data-enth="The Aeon" data-ptth="O Aeon">Judgement</text>
-    </g>
-    <g id="path_21" class="path-g" onclick="selectPath(event,21)">
-      <line x1="200" y1="850" x2="400" y2="1150" stroke="transparent" stroke-width="22" />
-      <line class="vis-line" x1="200" y1="850" x2="400" y2="1150" stroke="#666" stroke-width="3" />
     </g>
     <g id="label_21" class="path-label" style="opacity:0;pointer-events:none;transform-origin:262.9179606750063px 1078.5410196624969px;transform:scale(0.85);">
       <line x1="330.0" y1="1045.0" x2="262.9179606750063" y2="1078.5410196624969" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4,3" />
@@ -369,65 +443,10 @@
       <text id="lnum_21" x="262.9179606750063" y="1078.5410196624969" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#777" data-gd="XXI" data-th="XXI">XXI</text>
       <text id="lname_21" x="262.9179606750063" y="1092.5410196624969" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#444" data-enger="The World" data-ptger="O Mundo" data-enth="The Universe" data-ptth="O Universo">The World</text>
     </g>
-
-    <g id="seph_Keter" class="seph-g" onclick="selectSphere(event,'Keter')">
-      <circle cx="400" cy="100" r="50" fill="#fff5cc" stroke="#daa520" stroke-width="3" />
-      <text id="sname_Keter" x="400" y="87" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Keter" data-pt="Keter">Keter</text>
-      <text x="400" y="114" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">🝲</text>
-    </g>
-    <g id="seph_Chokmah" class="seph-g" onclick="selectSphere(event,'Chokmah')">
-      <circle cx="600" cy="250" r="50" fill="#cce5ff" stroke="#1e90ff" stroke-width="3" />
-      <text id="sname_Chokmah" x="600" y="237" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Chokmah" data-pt="Chokmah">Chokmah</text>
-      <text x="600" y="264" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">★</text>
-    </g>
-    <g id="seph_Binah" class="seph-g" onclick="selectSphere(event,'Binah')">
-      <circle cx="200" cy="250" r="50" fill="#fcdada" stroke="#800000" stroke-width="3" />
-      <text id="sname_Binah" x="200" y="237" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Binah" data-pt="Binah">Binah</text>
-      <text x="200" y="264" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">♄</text>
-    </g>
-    <g id="seph_Chesed" class="seph-g" onclick="selectSphere(event,'Chesed')">
-      <circle cx="600" cy="550" r="50" fill="#99ccff" stroke="#1e90ff" stroke-width="3" />
-      <text id="sname_Chesed" x="600" y="537" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Chesed" data-pt="Chesed">Chesed</text>
-      <text x="600" y="564" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">♃</text>
-    </g>
-    <g id="seph_Geburah" class="seph-g" onclick="selectSphere(event,'Geburah')">
-      <circle cx="200" cy="550" r="50" fill="#fcbcbc" stroke="#800000" stroke-width="3" />
-      <text id="sname_Geburah" x="200" y="537" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Geburah" data-pt="Geburah">Geburah</text>
-      <text x="200" y="564" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">♂</text>
-    </g>
-    <g id="seph_Tiphareth" class="seph-g" onclick="selectSphere(event,'Tiphareth')">
-      <circle cx="400" cy="700" r="50" fill="#fff0a5" stroke="#daa520" stroke-width="3" />
-      <text id="sname_Tiphareth" x="400" y="687" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Tiphareth" data-pt="Tiphareth">Tiphareth</text>
-      <text x="400" y="714" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">☉</text>
-    </g>
-    <g id="seph_Netzach" class="seph-g" onclick="selectSphere(event,'Netzach')">
-      <circle cx="600" cy="850" r="50" fill="#66b3ff" stroke="#1e90ff" stroke-width="3" />
-      <text id="sname_Netzach" x="600" y="837" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Netzach" data-pt="Netzach">Netzach</text>
-      <text x="600" y="864" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">♀</text>
-    </g>
-    <g id="seph_Hod" class="seph-g" onclick="selectSphere(event,'Hod')">
-      <circle cx="200" cy="850" r="50" fill="#fca5a5" stroke="#800000" stroke-width="3" />
-      <text id="sname_Hod" x="200" y="837" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Hod" data-pt="Hod">Hod</text>
-      <text x="200" y="864" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">☿</text>
-    </g>
-    <g id="seph_Yesod" class="seph-g" onclick="selectSphere(event,'Yesod')">
-      <circle cx="400" cy="1000" r="50" fill="#ffe680" stroke="#daa520" stroke-width="3" />
-      <text id="sname_Yesod" x="400" y="987" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Yesod" data-pt="Yesod">Yesod</text>
-      <text x="400" y="1014" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">☽</text>
-    </g>
-    <g id="seph_Malkuth" class="seph-g" onclick="selectSphere(event,'Malkuth')">
-      <circle cx="400" cy="1150" r="50" fill="#ffd700" stroke="#daa520" stroke-width="3" />
-      <text id="sname_Malkuth" x="400" y="1137" text-anchor="middle" dominant-baseline="middle" font-weight="bold" font-size="14" fill="#333" data-en="Malkuth" data-pt="Malkuth">Malkuth</text>
-      <text x="400" y="1164" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI Symbol',sans-serif" font-size="26" fill="#333">♁</text>
-    </g>
-    <g id="seph_Daat" class="seph-g" onclick="selectSphere(event,'Daat')">
-      <circle cx="400" cy="400" r="37" fill="#d1a3ff" stroke="#777" stroke-width="2" stroke-dasharray="7,5" />
-      <text id="sname_Daat" x="400" y="400" text-anchor="middle" dominant-baseline="middle" font-style="italic" font-weight="bold" font-size="15" fill="#555" data-en="Da'at" data-pt="Da'at">Da'at</text>
-    </g>
   </svg>
 </div>
-<div class="panel" id="sidePanel">
-  <button class="dock-btn" id="dockBtn" onclick="togglePanel(event)" title="Toggle panel">&#9654;</button>
+<div class="panel closed" id="sidePanel">
+  <button class="dock-btn" id="dockBtn" onclick="togglePanel(event)" title="Toggle panel">&#9664;</button>
   <div class="panel-inner">
   <div class="tabs-bar">
     <button class="tab-btn active" id="tb-seph" onclick="openTab('t-seph',this)">Sephirot</button>
@@ -445,20 +464,20 @@
       <tbody>
       <tr onclick="selectSphere(event,'Keter')">
         <td style="font-weight:700" data-en="Keter" data-pt="Keter">Keter</td>
-        <td class="sym" data-en="Divine / None" data-pt="Divino / Nenhum">Divine / None</td>
-        <td data-en="Spirit" data-pt="Espírito">Spirit</td>
+        <td class="sym" data-en="♔ Rashith ha-Gilgalim (Primum Mobile)" data-pt="♔ Rashith ha-Gilgalim (Primum Mobile)">♔ Rashith ha-Gilgalim (Primum Mobile)</td>
+        <td data-en="Spirit ☇" data-pt="Espírito ☇">Spirit ☇</td>
         <td class="sym" data-en="None" data-pt="Nenhum">None</td>
       </tr>
       <tr onclick="selectSphere(event,'Chokmah')">
         <td style="font-weight:700" data-en="Chokmah" data-pt="Chokmah">Chokmah</td>
-        <td class="sym" data-en="Zodiac / Stars" data-pt="Zodíaco / Estrelas">Zodiac / Stars</td>
-        <td data-en="Fire" data-pt="Fogo">Fire</td>
+        <td class="sym" data-en="✴ Mazloth (Zodiac / Fixed Stars)" data-pt="✴ Mazloth (Zodíaco / Estrelas)">✴ Mazloth (Zodiac / Fixed Stars)</td>
+        <td data-en="🜂 Fire" data-pt="🜂 Fogo">🜂 Fire</td>
         <td class="sym" data-en="None" data-pt="Nenhum">None</td>
       </tr>
       <tr onclick="selectSphere(event,'Binah')">
         <td style="font-weight:700" data-en="Binah" data-pt="Binah">Binah</td>
         <td class="sym" data-en="♄ Saturn" data-pt="♄ Saturno">♄ Saturn</td>
-        <td data-en="Earth / Water" data-pt="Terra / Água">Earth / Water</td>
+        <td data-en="♁ Earth / 🜄 Water" data-pt="♁ Terra / 🜄 Água">♁ Earth / 🜄 Water</td>
         <td class="sym" data-en="Lead (♄)" data-pt="Chumbo (♄)">Lead (♄)</td>
       </tr>
       <tr onclick="selectSphere(event,'Daat')">
@@ -470,43 +489,43 @@
       <tr onclick="selectSphere(event,'Chesed')">
         <td style="font-weight:700" data-en="Chesed" data-pt="Chesed">Chesed</td>
         <td class="sym" data-en="♃ Jupiter" data-pt="♃ Júpiter">♃ Jupiter</td>
-        <td data-en="Water" data-pt="Água">Water</td>
+        <td data-en="🜄 Water" data-pt="🜄 Água">🜄 Water</td>
         <td class="sym" data-en="Tin (♃)" data-pt="Estanho (♃)">Tin (♃)</td>
       </tr>
       <tr onclick="selectSphere(event,'Geburah')">
         <td style="font-weight:700" data-en="Geburah" data-pt="Geburah">Geburah</td>
         <td class="sym" data-en="♂ Mars" data-pt="♂ Marte">♂ Mars</td>
-        <td data-en="Fire" data-pt="Fogo">Fire</td>
+        <td data-en="🜂 Fire" data-pt="🜂 Fogo">🜂 Fire</td>
         <td class="sym" data-en="Iron (♂)" data-pt="Ferro (♂)">Iron (♂)</td>
       </tr>
       <tr onclick="selectSphere(event,'Tiphareth')">
         <td style="font-weight:700" data-en="Tiphareth" data-pt="Tiphareth">Tiphareth</td>
         <td class="sym" data-en="☉ Sun" data-pt="☉ Sol">☉ Sun</td>
-        <td data-en="Fire / Harmony" data-pt="Fogo / Harmonia">Fire / Harmony</td>
+        <td data-en="🜂 Fire / Harmony" data-pt="🜂 Fogo / Harmonia">🜂 Fire / Harmony</td>
         <td class="sym" data-en="Gold (☉)" data-pt="Ouro (☉)">Gold (☉)</td>
       </tr>
       <tr onclick="selectSphere(event,'Netzach')">
         <td style="font-weight:700" data-en="Netzach" data-pt="Netzach">Netzach</td>
         <td class="sym" data-en="♀ Venus" data-pt="♀ Vênus">♀ Venus</td>
-        <td data-en="Earth / Water" data-pt="Terra / Água">Earth / Water</td>
+        <td data-en="♁ Earth / 🜄 Water" data-pt="♁ Terra / 🜄 Água">♁ Earth / 🜄 Water</td>
         <td class="sym" data-en="Copper (♀)" data-pt="Cobre (♀)">Copper (♀)</td>
       </tr>
       <tr onclick="selectSphere(event,'Hod')">
         <td style="font-weight:700" data-en="Hod" data-pt="Hod">Hod</td>
         <td class="sym" data-en="☿ Mercury" data-pt="☿ Mercúrio">☿ Mercury</td>
-        <td data-en="Air" data-pt="Ar">Air</td>
+        <td data-en="🜁 Air" data-pt="🜁 Ar">🜁 Air</td>
         <td class="sym" data-en="Mercury (☿)" data-pt="Mercúrio (☿)">Mercury (☿)</td>
       </tr>
       <tr onclick="selectSphere(event,'Yesod')">
         <td style="font-weight:700" data-en="Yesod" data-pt="Yesod">Yesod</td>
         <td class="sym" data-en="☽ Moon" data-pt="☽ Lua">☽ Moon</td>
-        <td data-en="Water" data-pt="Água">Water</td>
+        <td data-en="🜄 Water" data-pt="🜄 Água">🜄 Water</td>
         <td class="sym" data-en="Silver (☽)" data-pt="Prata (☽)">Silver (☽)</td>
       </tr>
       <tr onclick="selectSphere(event,'Malkuth')">
         <td style="font-weight:700" data-en="Malkuth" data-pt="Malkuth">Malkuth</td>
-        <td class="sym" data-en="Earth" data-pt="Terra">Earth</td>
-        <td data-en="Earth" data-pt="Terra">Earth</td>
+        <td class="sym" data-en="♁ Earth" data-pt="♁ Terra">♁ Earth</td>
+        <td data-en="♁ Earth" data-pt="♁ Terra">♁ Earth</td>
         <td class="sym" data-en="None" data-pt="Nenhum">None</td>
       </tr>
       </tbody></table></div>
@@ -729,7 +748,7 @@
   </div>
 </div>
 <script>
-const SEPH = {"Keter": {"name": {"en": "Keter", "pt": "Keter"}, "planet": {"en": "Divine / None", "pt": "Divino / Nenhum"}, "element": {"en": "Spirit", "pt": "Esp\u00edrito"}, "metal": {"en": "None", "pt": "Nenhum"}}, "Chokmah": {"name": {"en": "Chokmah", "pt": "Chokmah"}, "planet": {"en": "Zodiac / Stars", "pt": "Zod\u00edaco / Estrelas"}, "element": {"en": "Fire", "pt": "Fogo"}, "metal": {"en": "None", "pt": "Nenhum"}}, "Binah": {"name": {"en": "Binah", "pt": "Binah"}, "planet": {"en": "\u2644 Saturn", "pt": "\u2644 Saturno"}, "element": {"en": "Earth / Water", "pt": "Terra / \u00c1gua"}, "metal": {"en": "Lead (\u2644)", "pt": "Chumbo (\u2644)"}}, "Daat": {"name": {"en": "Da'at", "pt": "Da'at"}, "planet": {"en": "None", "pt": "Nenhum"}, "element": {"en": "Knowledge / Void", "pt": "Conhecimento / Vazio"}, "metal": {"en": "None", "pt": "Nenhum"}}, "Chesed": {"name": {"en": "Chesed", "pt": "Chesed"}, "planet": {"en": "\u2643 Jupiter", "pt": "\u2643 J\u00fapiter"}, "element": {"en": "Water", "pt": "\u00c1gua"}, "metal": {"en": "Tin (\u2643)", "pt": "Estanho (\u2643)"}}, "Geburah": {"name": {"en": "Geburah", "pt": "Geburah"}, "planet": {"en": "\u2642 Mars", "pt": "\u2642 Marte"}, "element": {"en": "Fire", "pt": "Fogo"}, "metal": {"en": "Iron (\u2642)", "pt": "Ferro (\u2642)"}}, "Tiphareth": {"name": {"en": "Tiphareth", "pt": "Tiphareth"}, "planet": {"en": "\u2609 Sun", "pt": "\u2609 Sol"}, "element": {"en": "Fire / Harmony", "pt": "Fogo / Harmonia"}, "metal": {"en": "Gold (\u2609)", "pt": "Ouro (\u2609)"}}, "Netzach": {"name": {"en": "Netzach", "pt": "Netzach"}, "planet": {"en": "\u2640 Venus", "pt": "\u2640 V\u00eanus"}, "element": {"en": "Earth / Water", "pt": "Terra / \u00c1gua"}, "metal": {"en": "Copper (\u2640)", "pt": "Cobre (\u2640)"}}, "Hod": {"name": {"en": "Hod", "pt": "Hod"}, "planet": {"en": "\u263f Mercury", "pt": "\u263f Merc\u00fario"}, "element": {"en": "Air", "pt": "Ar"}, "metal": {"en": "Mercury (\u263f)", "pt": "Merc\u00fario (\u263f)"}}, "Yesod": {"name": {"en": "Yesod", "pt": "Yesod"}, "planet": {"en": "\u263d Moon", "pt": "\u263d Lua"}, "element": {"en": "Water", "pt": "\u00c1gua"}, "metal": {"en": "Silver (\u263d)", "pt": "Prata (\u263d)"}}, "Malkuth": {"name": {"en": "Malkuth", "pt": "Malkuth"}, "planet": {"en": "Earth", "pt": "Terra"}, "element": {"en": "Earth", "pt": "Terra"}, "metal": {"en": "None", "pt": "Nenhum"}}};
+const SEPH = {"Keter": {"name": {"en": "Keter", "pt": "Keter"}, "planet": {"en": "\u2654 Rashith ha-Gilgalim (Primum Mobile)", "pt": "\u2654 Rashith ha-Gilgalim (Primum Mobile)"}, "element": {"en": "Spirit \u2607", "pt": "Esp\u00edrito \u2607"}, "metal": {"en": "None", "pt": "Nenhum"}}, "Chokmah": {"name": {"en": "Chokmah", "pt": "Chokmah"}, "planet": {"en": "\u2734 Mazloth (Zodiac / Fixed Stars)", "pt": "\u2734 Mazloth (Zod\u00edaco / Estrelas)"}, "element": {"en": "\ud83d\udf02 Fire", "pt": "\ud83d\udf02 Fogo"}, "metal": {"en": "None", "pt": "Nenhum"}}, "Binah": {"name": {"en": "Binah", "pt": "Binah"}, "planet": {"en": "\u2644 Saturn", "pt": "\u2644 Saturno"}, "element": {"en": "\u2641 Earth / \ud83d\udf04 Water", "pt": "\u2641 Terra / \ud83d\udf04 \u00c1gua"}, "metal": {"en": "Lead (\u2644)", "pt": "Chumbo (\u2644)"}}, "Daat": {"name": {"en": "Da'at", "pt": "Da'at"}, "planet": {"en": "None", "pt": "Nenhum"}, "element": {"en": "Knowledge / Void", "pt": "Conhecimento / Vazio"}, "metal": {"en": "None", "pt": "Nenhum"}}, "Chesed": {"name": {"en": "Chesed", "pt": "Chesed"}, "planet": {"en": "\u2643 Jupiter", "pt": "\u2643 J\u00fapiter"}, "element": {"en": "\ud83d\udf04 Water", "pt": "\ud83d\udf04 \u00c1gua"}, "metal": {"en": "Tin (\u2643)", "pt": "Estanho (\u2643)"}}, "Geburah": {"name": {"en": "Geburah", "pt": "Geburah"}, "planet": {"en": "\u2642 Mars", "pt": "\u2642 Marte"}, "element": {"en": "\ud83d\udf02 Fire", "pt": "\ud83d\udf02 Fogo"}, "metal": {"en": "Iron (\u2642)", "pt": "Ferro (\u2642)"}}, "Tiphareth": {"name": {"en": "Tiphareth", "pt": "Tiphareth"}, "planet": {"en": "\u2609 Sun", "pt": "\u2609 Sol"}, "element": {"en": "\ud83d\udf02 Fire / Harmony", "pt": "\ud83d\udf02 Fogo / Harmonia"}, "metal": {"en": "Gold (\u2609)", "pt": "Ouro (\u2609)"}}, "Netzach": {"name": {"en": "Netzach", "pt": "Netzach"}, "planet": {"en": "\u2640 Venus", "pt": "\u2640 V\u00eanus"}, "element": {"en": "\u2641 Earth / \ud83d\udf04 Water", "pt": "\u2641 Terra / \ud83d\udf04 \u00c1gua"}, "metal": {"en": "Copper (\u2640)", "pt": "Cobre (\u2640)"}}, "Hod": {"name": {"en": "Hod", "pt": "Hod"}, "planet": {"en": "\u263f Mercury", "pt": "\u263f Merc\u00fario"}, "element": {"en": "\ud83d\udf01 Air", "pt": "\ud83d\udf01 Ar"}, "metal": {"en": "Mercury (\u263f)", "pt": "Merc\u00fario (\u263f)"}}, "Yesod": {"name": {"en": "Yesod", "pt": "Yesod"}, "planet": {"en": "\u263d Moon", "pt": "\u263d Lua"}, "element": {"en": "\ud83d\udf04 Water", "pt": "\ud83d\udf04 \u00c1gua"}, "metal": {"en": "Silver (\u263d)", "pt": "Prata (\u263d)"}}, "Malkuth": {"name": {"en": "Malkuth", "pt": "Malkuth"}, "planet": {"en": "\u2641 Earth", "pt": "\u2641 Terra"}, "element": {"en": "\u2641 Earth", "pt": "\u2641 Terra"}, "metal": {"en": "None", "pt": "Nenhum"}}};
 const PATHS = {"0": {"id": 0, "letter": "Aleph", "heb": "\u05d0", "s1": "Keter", "s2": "Chokmah", "tarot_gd_num": "0", "tarot_gd_name": {"en": "The Fool", "pt": "O Louco"}, "tarot_th_num": "0", "tarot_th_name": {"en": "The Fool", "pt": "O Louco"}, "attr_type": {"en": "Element", "pt": "Elemento"}, "attr_val": {"en": "\ud83d\udf01 Air", "pt": "\ud83d\udf01 Ar"}}, "1": {"id": 1, "letter": "Beth", "heb": "\u05d1", "s1": "Keter", "s2": "Binah", "tarot_gd_num": "I", "tarot_gd_name": {"en": "The Magician", "pt": "O Mago"}, "tarot_th_num": "I", "tarot_th_name": {"en": "The Magician", "pt": "O Mago"}, "attr_type": {"en": "Planet", "pt": "Planeta"}, "attr_val": {"en": "\u263f Mercury", "pt": "\u263f Merc\u00fario"}}, "2": {"id": 2, "letter": "Gimel", "heb": "\u05d2", "s1": "Keter", "s2": "Tiphareth", "tarot_gd_num": "II", "tarot_gd_name": {"en": "High Priestess", "pt": "A Sacerdotisa"}, "tarot_th_num": "II", "tarot_th_name": {"en": "High Priestess", "pt": "A Sacerdotisa"}, "attr_type": {"en": "Planet", "pt": "Planeta"}, "attr_val": {"en": "\u263d Moon", "pt": "\u263d Lua"}}, "3": {"id": 3, "letter": "Daleth", "heb": "\u05d3", "s1": "Binah", "s2": "Chokmah", "tarot_gd_num": "III", "tarot_gd_name": {"en": "The Empress", "pt": "A Imperatriz"}, "tarot_th_num": "III", "tarot_th_name": {"en": "The Empress", "pt": "A Imperatriz"}, "attr_type": {"en": "Planet", "pt": "Planeta"}, "attr_val": {"en": "\u2640 Venus", "pt": "\u2640 V\u00eanus"}}, "4": {"id": 4, "letter": "He", "heb": "\u05d4", "s1": "Chokmah", "s2": "Chesed", "tarot_gd_num": "IV", "tarot_gd_name": {"en": "The Emperor", "pt": "O Imperador"}, "tarot_th_num": "XVII", "tarot_th_name": {"en": "The Star", "pt": "A Estrela"}, "attr_type": {"en": "Zodiac", "pt": "Zod\u00edaco"}, "attr_val": {"en": "\u2648 Aries", "pt": "\u2648 \u00c1ries"}}, "5": {"id": 5, "letter": "Vav", "heb": "\u05d5", "s1": "Chokmah", "s2": "Tiphareth", "tarot_gd_num": "V", "tarot_gd_name": {"en": "The Hierophant", "pt": "O Hierofante"}, "tarot_th_num": "V", "tarot_th_name": {"en": "The Hierophant", "pt": "O Hierofante"}, "attr_type": {"en": "Zodiac", "pt": "Zod\u00edaco"}, "attr_val": {"en": "\u2649 Taurus", "pt": "\u2649 Touro"}}, "6": {"id": 6, "letter": "Zayin", "heb": "\u05d6", "s1": "Binah", "s2": "Tiphareth", "tarot_gd_num": "VI", "tarot_gd_name": {"en": "The Lovers", "pt": "Os Amantes"}, "tarot_th_num": "VI", "tarot_th_name": {"en": "The Lovers", "pt": "Os Amantes"}, "attr_type": {"en": "Zodiac", "pt": "Zod\u00edaco"}, "attr_val": {"en": "\u264a Gemini", "pt": "\u264a G\u00eameos"}}, "7": {"id": 7, "letter": "Cheth", "heb": "\u05d7", "s1": "Binah", "s2": "Geburah", "tarot_gd_num": "VII", "tarot_gd_name": {"en": "The Chariot", "pt": "O Carro"}, "tarot_th_num": "VII", "tarot_th_name": {"en": "The Chariot", "pt": "O Carro"}, "attr_type": {"en": "Zodiac", "pt": "Zod\u00edaco"}, "attr_val": {"en": "\u264b Cancer", "pt": "\u264b C\u00e2ncer"}}, "8": {"id": 8, "letter": "Teth", "heb": "\u05d8", "s1": "Geburah", "s2": "Chesed", "tarot_gd_num": "VIII", "tarot_gd_name": {"en": "Strength", "pt": "For\u00e7a"}, "tarot_th_num": "VIII", "tarot_th_name": {"en": "Strength", "pt": "For\u00e7a"}, "attr_type": {"en": "Zodiac", "pt": "Zod\u00edaco"}, "attr_val": {"en": "\u264c Leo", "pt": "\u264c Le\u00e3o"}}, "9": {"id": 9, "letter": "Yod", "heb": "\u05d9", "s1": "Chesed", "s2": "Tiphareth", "tarot_gd_num": "IX", "tarot_gd_name": {"en": "The Hermit", "pt": "O Eremita"}, "tarot_th_num": "IX", "tarot_th_name": {"en": "The Hermit", "pt": "O Eremita"}, "attr_type": {"en": "Zodiac", "pt": "Zod\u00edaco"}, "attr_val": {"en": "\u264d Virgo", "pt": "\u264d Virgem"}}, "10": {"id": 10, "letter": "Kaph", "heb": "\u05db", "s1": "Chesed", "s2": "Netzach", "tarot_gd_num": "X", "tarot_gd_name": {"en": "Wheel of Fortune", "pt": "A Roda da Fortuna"}, "tarot_th_num": "X", "tarot_th_name": {"en": "Wheel of Fortune", "pt": "A Roda da Fortuna"}, "attr_type": {"en": "Planet", "pt": "Planeta"}, "attr_val": {"en": "\u2643 Jupiter", "pt": "\u2643 J\u00fapiter"}}, "11": {"id": 11, "letter": "Lamed", "heb": "\u05dc", "s1": "Geburah", "s2": "Tiphareth", "tarot_gd_num": "XI", "tarot_gd_name": {"en": "Justice", "pt": "Justi\u00e7a"}, "tarot_th_num": "XI", "tarot_th_name": {"en": "Justice", "pt": "Justi\u00e7a"}, "attr_type": {"en": "Zodiac", "pt": "Zod\u00edaco"}, "attr_val": {"en": "\u264e Libra", "pt": "\u264e Libra"}}, "12": {"id": 12, "letter": "Mem", "heb": "\u05de", "s1": "Geburah", "s2": "Hod", "tarot_gd_num": "XII", "tarot_gd_name": {"en": "The Hanged Man", "pt": "O Enforcado"}, "tarot_th_num": "XII", "tarot_th_name": {"en": "The Hanged Man", "pt": "O Enforcado"}, "attr_type": {"en": "Element", "pt": "Elemento"}, "attr_val": {"en": "\ud83d\udf04 Water", "pt": "\ud83d\udf04 \u00c1gua"}}, "13": {"id": 13, "letter": "Nun", "heb": "\u05e0", "s1": "Tiphareth", "s2": "Netzach", "tarot_gd_num": "XIII", "tarot_gd_name": {"en": "Death", "pt": "A Morte"}, "tarot_th_num": "XIII", "tarot_th_name": {"en": "Death", "pt": "A Morte"}, "attr_type": {"en": "Zodiac", "pt": "Zod\u00edaco"}, "attr_val": {"en": "\u264f Scorpio", "pt": "\u264f Escorpi\u00e3o"}}, "14": {"id": 14, "letter": "Samekh", "heb": "\u05e1", "s1": "Tiphareth", "s2": "Yesod", "tarot_gd_num": "XIV", "tarot_gd_name": {"en": "Temperance", "pt": "Temperan\u00e7a"}, "tarot_th_num": "XIV", "tarot_th_name": {"en": "Temperance", "pt": "Temperan\u00e7a"}, "attr_type": {"en": "Zodiac", "pt": "Zod\u00edaco"}, "attr_val": {"en": "\u2650 Sagittarius", "pt": "\u2650 Sagit\u00e1rio"}}, "15": {"id": 15, "letter": "Ayin", "heb": "\u05e2", "s1": "Tiphareth", "s2": "Hod", "tarot_gd_num": "XV", "tarot_gd_name": {"en": "The Devil", "pt": "O Diabo"}, "tarot_th_num": "XV", "tarot_th_name": {"en": "The Devil", "pt": "O Diabo"}, "attr_type": {"en": "Zodiac", "pt": "Zod\u00edaco"}, "attr_val": {"en": "\u2651 Capricorn", "pt": "\u2651 Capric\u00f3rnio"}}, "16": {"id": 16, "letter": "Pe", "heb": "\u05e4", "s1": "Hod", "s2": "Netzach", "tarot_gd_num": "XVI", "tarot_gd_name": {"en": "The Tower", "pt": "A Torre"}, "tarot_th_num": "XVI", "tarot_th_name": {"en": "The Tower", "pt": "A Torre"}, "attr_type": {"en": "Planet", "pt": "Planeta"}, "attr_val": {"en": "\u2642 Mars", "pt": "\u2642 Marte"}}, "17": {"id": 17, "letter": "Tzaddi", "heb": "\u05e6", "s1": "Netzach", "s2": "Yesod", "tarot_gd_num": "XVII", "tarot_gd_name": {"en": "The Star", "pt": "A Estrela"}, "tarot_th_num": "IV", "tarot_th_name": {"en": "The Emperor", "pt": "O Imperador"}, "attr_type": {"en": "Zodiac", "pt": "Zod\u00edaco"}, "attr_val": {"en": "\u2652 Aquarius", "pt": "\u2652 Aqu\u00e1rio"}}, "18": {"id": 18, "letter": "Qoph", "heb": "\u05e7", "s1": "Hod", "s2": "Yesod", "tarot_gd_num": "XVIII", "tarot_gd_name": {"en": "The Moon", "pt": "A Lua"}, "tarot_th_num": "XVIII", "tarot_th_name": {"en": "The Moon", "pt": "A Lua"}, "attr_type": {"en": "Zodiac", "pt": "Zod\u00edaco"}, "attr_val": {"en": "\u2653 Pisces", "pt": "\u2653 Peixes"}}, "19": {"id": 19, "letter": "Resh", "heb": "\u05e8", "s1": "Yesod", "s2": "Malkuth", "tarot_gd_num": "XIX", "tarot_gd_name": {"en": "The Sun", "pt": "O Sol"}, "tarot_th_num": "XIX", "tarot_th_name": {"en": "The Sun", "pt": "O Sol"}, "attr_type": {"en": "Planet", "pt": "Planeta"}, "attr_val": {"en": "\u2609 Sun", "pt": "\u2609 Sol"}}, "20": {"id": 20, "letter": "Shin", "heb": "\u05e9", "s1": "Netzach", "s2": "Malkuth", "tarot_gd_num": "XX", "tarot_gd_name": {"en": "Judgement", "pt": "Julgamento"}, "tarot_th_num": "XX", "tarot_th_name": {"en": "The Aeon", "pt": "O Aeon"}, "attr_type": {"en": "Element", "pt": "Elemento"}, "attr_val": {"en": "\ud83d\udf02 Fire", "pt": "\ud83d\udf02 Fogo"}}, "21": {"id": 21, "letter": "Tav", "heb": "\u05ea", "s1": "Hod", "s2": "Malkuth", "tarot_gd_num": "XXI", "tarot_gd_name": {"en": "The World", "pt": "O Mundo"}, "tarot_th_num": "XXI", "tarot_th_name": {"en": "The Universe", "pt": "O Universo"}, "attr_type": {"en": "Planet", "pt": "Planeta"}, "attr_val": {"en": "\u2644 Saturn", "pt": "\u2644 Saturno"}}};
 
 const L = {
@@ -757,10 +776,10 @@ const L = {
 
 let lang = "en";
 let sys = "gd";
-let selectedPath = null;
-let selectedSphere = null;
+let selectedPath = null; // Deprecated, but keep for label logic briefly
+let selections = []; // Array of {type: 'path'|'sphere', id: string|number}
 let showAll = false;
-let panelOpen = true;
+let panelOpen = false;
 
 // --- LANGUAGE ---
 function setLang(e, newLang) {
@@ -784,7 +803,7 @@ function applySystem() {
   for (let pid = 0; pid < 22; pid++) {
     const lnum = document.getElementById("lnum_" + pid);
     const lname = document.getElementById("lname_" + pid);
-    if (!lnum || !lname) break;
+    if (!lnum || !lname) continue;
 
     lnum.textContent = lnum.getAttribute("data-" + sys);
     
@@ -799,10 +818,19 @@ function applySystem() {
       td_tarot.textContent = td_tarot.getAttribute("data-" + comb);
     }
   }
+  // refresh info panels if visible
+  refreshFromSelections();
+}
 
-  applySystem();
-  // refresh info panel if visible
-  if (selectedPath !== null) refreshPathInfo(selectedPath);
+function refreshFromSelections() {
+  hideInfo("infoPanel");
+  hideInfo("hoverInfoPanel");
+  selections.forEach((sel, idx) => {
+    const isHover = false;
+    const target = idx === 0 ? "infoPanel" : "hoverInfoPanel";
+    if (sel.type === 'path') refreshPathInfo(sel.id, isHover, target);
+    else refreshSphereInfo(sel.id, isHover, target);
+  });
 }
 
 // Hook applySystem inside applyLang to update textual values on language change
@@ -832,9 +860,8 @@ function applyLang() {
   // dock btn
   document.getElementById("dockBtn").innerHTML = panelOpen ? l.dock_open : l.dock_close;
   applySystem();
-  // refresh info panel if visible
-  if (selectedPath !== null) refreshPathInfo(selectedPath);
-  if (selectedSphere !== null) refreshSphereInfo(selectedSphere);
+  applySystem();
+  refreshFromSelections();
 }
 function setT(id, txt) { const el = document.getElementById(id); if (el) el.textContent = txt; }
 
@@ -853,74 +880,96 @@ function toggleAllLabels(e) {
   btn.classList.toggle("active", showAll);
   btn.textContent = showAll ? L[lang].btn_hide : L[lang].btn_show;
   for (let pid = 0; pid < 22; pid++) {
-    const sel = selectedPath === pid;
+    const sel = selections.some(s => s.type === 'path' && s.id === pid);
     applyLabelState(pid, showAll || sel, sel);
   }
+}
+
+function updateVisuals() {
+  // Clear all highlights
+  document.querySelectorAll(".path-g, .seph-g").forEach(el => el.classList.remove("selected"));
+  // Re-apply highlights and label states
+  for (let pid = 0; pid < 22; pid++) {
+    const isSel = selections.some(s => s.type === 'path' && s.id === pid);
+    if (isSel) document.getElementById("path_" + pid)?.classList.add("selected");
+    if (!showAll) applyLabelState(pid, isSel, isSel);
+  }
+  selections.forEach(sel => {
+    if (sel.type === 'sphere') document.getElementById("seph_" + sel.id)?.classList.add("selected");
+  });
 }
 
 // --- PATH SELECTION ---
 function selectPath(e, pid) {
   e.stopPropagation();
-  // deselect sphere
-  if (selectedSphere !== null) {
-    document.getElementById("seph_" + selectedSphere)?.classList.remove("selected");
-    selectedSphere = null;
+  hideInfo("hoverInfoPanel");
+
+  const idx = selections.findIndex(s => s.type === 'path' && s.id === pid);
+  if (idx !== -1) {
+    // Toggle off
+    selections.splice(idx, 1);
+  } else {
+    if (selections.length >= 2) {
+      // Third click resets
+      selections = [{ type: 'path', id: pid }];
+    } else {
+      selections.push({ type: 'path', id: pid });
+    }
   }
-  // deselect previous path
-  if (selectedPath !== null && selectedPath !== pid) {
-    document.getElementById("path_" + selectedPath)?.classList.remove("selected");
-    if (!showAll) applyLabelState(selectedPath, false, false);
-  }
-  // toggle same path
-  if (selectedPath === pid) {
-    document.getElementById("path_" + pid)?.classList.remove("selected");
-    if (!showAll) applyLabelState(pid, false, false);
-    selectedPath = null;
-    hideInfo();
-    return;
-  }
-  selectedPath = pid;
-  document.getElementById("path_" + pid)?.classList.add("selected");
-  applyLabelState(pid, true, true);
-  refreshPathInfo(pid);
+  updateVisuals();
+  refreshFromSelections();
 }
 
-function refreshPathInfo(pid) {
+function refreshPathInfo(pid, isHover, forceTarget) {
   const d = PATHS[pid];
   const l = L[lang];
-  const tname = typeof d.tarot_name === "object" ? d.tarot_name[lang] : d.tarot_name;
-  showInfo("#e74c3c", "Path " + d.id + ": " + d.letter + " – " + d.heb, [
+  const tname = sys === 'gd' ? d.tarot_gd_name[lang] : d.tarot_th_name[lang];
+  const tnum = sys === 'gd' ? d.tarot_gd_num : d.tarot_th_num;
+  const attr_type = d.attr_type[lang];
+  const attr_val = d.attr_val[lang];
+  
+  let target = forceTarget;
+  if (!target) {
+    if (isHover) {
+       if (selections.length === 0) target = "infoPanel";
+       else if (selections.length === 1) target = "hoverInfoPanel";
+       else return; // Max visible
+    } else target = "infoPanel";
+  }
+  
+  if (isHover && !showAll) applyLabelState(pid, true, true);
+  
+  const p = document.getElementById(target);
+  if (p) p.style.display = "block";
+
+  showInfo(target, "#e74c3c", "Path " + d.id + ": " + d.letter + " – " + d.heb, [
     [l.info_connects, d.s1 + " ↔ " + d.s2],
-    [l.info_tarot, d.tarot + " | " + tname],
-    [l.info_planet, d.planet],
-    [l.info_zodiac, d.zodiac],
-    [l.info_alchem, d.alchem],
+    [l.info_tarot, tnum + " | " + tname],
+    [l.info_type, attr_type],
+    [l.info_attr, attr_val],
   ]);
 }
 
 // --- SPHERE SELECTION ---
 function selectSphere(e, key) {
   e.stopPropagation();
-  if (selectedPath !== null) {
-    document.getElementById("path_" + selectedPath)?.classList.remove("selected");
-    if (!showAll) applyLabelState(selectedPath, false, false);
-    selectedPath = null;
+  hideInfo("hoverInfoPanel");
+
+  const idx = selections.findIndex(s => s.type === 'sphere' && s.id === key);
+  if (idx !== -1) {
+    selections.splice(idx, 1);
+  } else {
+    if (selections.length >= 2) {
+      selections = [{ type: 'sphere', id: key }];
+    } else {
+      selections.push({ type: 'sphere', id: key });
+    }
   }
-  if (selectedSphere !== null && selectedSphere !== key) {
-    document.getElementById("seph_" + selectedSphere)?.classList.remove("selected");
-  }
-  if (selectedSphere === key) {
-    document.getElementById("seph_" + key)?.classList.remove("selected");
-    selectedSphere = null;
-    hideInfo();
-    return;
-  }
-  selectedSphere = key;
-  document.getElementById("seph_" + key)?.classList.add("selected");
-  refreshSphereInfo(key);
+  updateVisuals();
+  refreshFromSelections();
 }
 
-function refreshSphereInfo(key) {
+function refreshSphereInfo(key, isHover, forceTarget) {
   const d = SEPH[key];
   const l = L[lang];
   if (!d) return;
@@ -928,25 +977,49 @@ function refreshSphereInfo(key) {
   const planet = typeof d.planet  === "object" ? d.planet[lang]  : d.planet;
   const element= typeof d.element === "object" ? d.element[lang] : d.element;
   const metal  = typeof d.metal   === "object" ? d.metal[lang]   : d.metal;
-  showInfo("#3498db", name, [
+  
+  let target = forceTarget;
+  if (!target) {
+    if (isHover) {
+       if (selections.length === 0) target = "infoPanel";
+       else if (selections.length === 1) target = "hoverInfoPanel";
+       else return; 
+    } else target = "infoPanel";
+  }
+  
+  const p = document.getElementById(target);
+  if (p) p.style.display = "block";
+
+  showInfo(target, "#3498db", name, [
     [l.info_planet_s, planet],
-    [l.th_element, element],
+    [l.info_element_s || "Element", element],
     [l.info_metal, metal],
   ]);
 }
 
 // --- INFO PANEL ---
-function showInfo(color, title, rows) {
-  const p = document.getElementById("infoPanel");
+function showInfo(targetId, color, title, rows) {
+  const p = document.getElementById(targetId);
+  if (!p) return;
   p.style.borderLeftColor = color;
+  // right panel border
+  if (targetId === "hoverInfoPanel") p.style.borderRightColor = color;
+
   let html = "<h3>" + title + "</h3>";
   for (const [label, val] of rows)
     html += '<div class="info-row"><span class="info-label">' + label + '</span><span class="sym">' + val + "</span></div>";
   p.innerHTML = html;
   p.style.display = "block";
 }
-function hideInfo() {
-  document.getElementById("infoPanel").style.display = "none";
+function hideInfo(targetId) {
+  const p = document.getElementById(targetId || "infoPanel");
+  if (p) p.style.display = "none";
+  
+  if (targetId === "hoverInfoPanel") {
+    for (let pid = 0; pid < 22; pid++) {
+      if (!showAll && !selections.some(s => s.type === 'path' && s.id === pid)) applyLabelState(pid, false, false);
+    }
+  }
 }
 
 // --- BACKGROUND CLICK (clear selection) ---
@@ -958,16 +1031,10 @@ function handleBgClick(e) {
 
 function clearSelection(e) {
   if (e) e.stopPropagation();
-  if (selectedPath !== null) {
-    document.getElementById("path_" + selectedPath)?.classList.remove("selected");
-    if (!showAll) applyLabelState(selectedPath, false, false);
-    selectedPath = null;
-  }
-  if (selectedSphere !== null) {
-    document.getElementById("seph_" + selectedSphere)?.classList.remove("selected");
-    selectedSphere = null;
-  }
-  hideInfo();
+  selections = [];
+  updateVisuals();
+  hideInfo("infoPanel");
+  hideInfo("hoverInfoPanel");
 }
 
 // --- PANEL TOGGLE ---
